@@ -70,7 +70,7 @@ auto rolex_server_workers(const usize& nthreads) -> std::vector<std::unique_ptr<
       }
       // register the UD for connection
       ctrl->registered_qps.reg("b" + std::to_string(thread_id), qp_recv);
-      LOG(4) << "server thread #" << thread_id << " started!";
+      // LOG(4) << "server thread #" << thread_id << " started!";
 
       /**
        * @brief Construct RPC
@@ -95,7 +95,6 @@ auto rolex_server_workers(const usize& nthreads) -> std::vector<std::unique_ptr<
       while (!init) {
         r2::compile_fence();
       }
-      LOG(2) << "Thread " << thread_id << " start running";
       while (running) {
         r2::compile_fence();
         rpc.recv_event_loop(&recv);

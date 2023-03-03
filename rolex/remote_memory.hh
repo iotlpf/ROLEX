@@ -14,13 +14,13 @@ namespace rolex {
 class RM_config {
 public:
   rdmaio::RCtrl* ctrl;
-  uint32_t model_region_size;
+  uint64_t model_region_size;
 
-  uint32_t leaf_region_size;
+  uint64_t leaf_region_size;
   uint64_t reg_leaf_region;
   uint64_t leaf_num;
 
-  explicit RM_config(rdmaio::RCtrl* ctrl, uint32_t ms, uint32_t ls, uint64_t rlr, uint64_t ln) 
+  explicit RM_config(rdmaio::RCtrl* ctrl, uint64_t ms, uint64_t ls, uint64_t rlr, uint64_t ln) 
     : ctrl(ctrl), model_region_size(ms), leaf_region_size(ls), reg_leaf_region(rlr), leaf_num(ln) {}
 };
 
@@ -80,6 +80,7 @@ private:
   void init_allocator() {
     ASSERT(leaf_region) << "Leaf region not exist";
     leafAlloc = new leaf_alloc_t(static_cast<char *>(leaf_region->start_ptr()), leaf_region->size(), conf.leaf_num);
+    // leafAlloc = new leaf_alloc_t(static_cast<char *>(leaf_region->start_ptr()), leaf_region->size());
     ASSERT(model_region) << "Model region not exist";
     modelAlloc = new model_alloc_t(static_cast<char *>(model_region->start_ptr()), model_region->size());
   }

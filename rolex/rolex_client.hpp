@@ -65,7 +65,7 @@ auto rolex_client_worker(const usize& nthreads) -> std::vector<std::unique_ptr<X
        * 
        */
       //std::string server_addr = "192.168.3.101:8888";
-      std::string server_addr = "10.0.0.1:8888";
+      std::string server_addr = "10.0.0.1:8899";
       int ud_id = thread_id;
       UDTransport sender;
       {
@@ -113,13 +113,6 @@ auto rolex_client_worker(const usize& nthreads) -> std::vector<std::unique_ptr<X
       std::random_device rd;
       std::mt19937 gen(rd());
       std::uniform_real_distribution<> ratio_dis(0, 1);
-
-      // used for YCSB
-      size_t key_n_per_thread = YCSBconfig.operate_num / nthreads;
-      size_t key_start = thread_id * key_n_per_thread;
-      size_t key_end = (thread_id + 1) * key_n_per_thread;
-      std::vector<std::pair<KeyType, ValType>> result;
-      // LOG(3) << "YCSB, key_n_per_thread: "<< key_n_per_thread<<" key_start: " <<key_start<<" key_end: " <<key_end;
 
       SScheduler ssched;
       rpc.reg_poll_future(ssched, &recv_s);
@@ -169,44 +162,6 @@ auto rolex_client_worker(const usize& nthreads) -> std::vector<std::unique_ptr<X
                     remove_i = 0;
                 }
               }
-              BenConfig.statics[thread_id].increment();
-            }
-            if (R2_COR_ID() == BenConfig.coros) {
-              R2_STOP();
-            }
-            R2_RET;
-          });
-        }
-      } else {             // ycsb workloads
-        for(int co=0; co<BenConfig.coros; co++) {
-          ssched.spawn([&rpc, &sender,  
-                        thread_id, 
-                        key_start, key_end](R2_ASYNC) {
-            for(int i=key_start; i<key_end; i++) {
-              operation_item opi = YCSBconfig.operate_queue[i];
-              switch(opi.op) {
-                case 0:
-                {
-                  auto res = remote_search(opi.key, rpc, sender, R2_ASYNC_WAIT);
-                  break;
-                }
-                case 1:
-                  remote_put(opi.key, opi.key, rpc, sender, R2_ASYNC_WAIT);
-                  break;
-                case 2:
-                  remote_update(opi.key, opi.key, rpc, sender, R2_ASYNC_WAIT);
-                  break;
-                case 3:
-                  remote_remove(opi.key, rpc, sender, R2_ASYNC_WAIT);
-                  break;
-                case 4:
-                  remote_scan(opi.key, (u64)opi.range, rpc, sender, R2_ASYNC_WAIT);
-                  break;
-                default:
-                  ASSERT(false)<<"Wrong operator";
-                  break;
-              }
-              BenConfig.statics[thread_id].increment();
             }
             if (R2_COR_ID() == BenConfig.coros) {
               R2_STOP();

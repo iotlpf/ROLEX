@@ -6,10 +6,8 @@
 #include "rlib/core/qps/rc.hh"                /// RC
 #include "r2/src/libroutine.hh"               /// R2_ASYNC
 #include "r2/src/rdma/async_op.hh"            /// AsyncOP
-#include "../xcomm/src/batch_rw_op.hh"        /// BatchOp
 #include "rolex/local_allocator.hh"
 
-using namespace xstore::xcomm;
 using namespace r2;
 using namespace r2::rdma;
 using namespace rdmaio;
@@ -74,17 +72,6 @@ public:
 
   // using for data_rc
   void read_leaves_asyn(std::vector<leaf_addr_t> leaves, char *local_buf, const u32 &each_len, R2_ASYNC) {
-    /*BatchOp<16> reqs;
-    for(int i=0; i<leaves.size(); i++) {
-      reqs.emplace();
-      reqs.get_cur_op()
-          .set_read()
-          .set_rdma_addr(sizeof(u64)*2 + leaves[i].addr.leaf_num*each_len, data_rc->remote_mr.value())
-          .set_payload(
-            local_buf + each_len * i, each_len, data_rc->local_mr.value().lkey);
-    }
-    auto ret = reqs.execute_async(data_rc, R2_ASYNC_WAIT);
-    ASSERT(ret == ::rdmaio::IOCode::Ok);*/
     AsyncOp<1> op;
     op.set_read()
       .set_rdma_addr(sizeof(u64)*2 + leaves[0].addr.leaf_num*each_len, data_rc->remote_mr.value())

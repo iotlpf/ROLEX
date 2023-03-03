@@ -137,7 +137,7 @@ public:
     append_model(cs_slope, cs_intercept, k_iter, v_iter, ++pos);
 
     u64 total_size = models.size();
-    LOG(4) << "Training models: "<<total_size;
+    LOG(4) << "Training models: "<<total_size<<" used leaves: "<<this->RM->leaf_allocator()->used_num();
     assert(model_keys.size() == total_size);
     // write total_num into model_region
     memcpy(RM->model_allocator()->get_total_ptr(), &total_size, sizeof(u64));

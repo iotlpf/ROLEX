@@ -156,6 +156,7 @@ public:
     hi /= leaf_t::max_slot();
     int l=std::max((int)lo, 0);
     int h=std::max((int)hi, 0);
+    // LOG(2) << "model predict leaf l: " <<l<<", h: "<<h;
     return ltable.insert(key, val, alloc, l, h);
   }
 

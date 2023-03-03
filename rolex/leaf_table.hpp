@@ -7,6 +7,7 @@
 
 #include "r2/src/common.hh"
 #include "xutils/marshal.hh"
+#include "xutils/spin_lock.hh"
 
 
 
@@ -84,6 +85,7 @@ struct LeafTable {
 
   std::vector<TE> table;
   TE SynonymTable[kSynonymMax];
+  std::vector<::xstore::util::SpinLock*> csLocks;
 
   LeafTable() { 
     SynonymTable[0].leaf_num = 1;           // SynonymTable[0] indicate the next available slot 
@@ -108,6 +110,7 @@ struct LeafTable {
                .synonym_leaf=synonym_leaf, 
                .leaf_num=leaf_num} };
     table.emplace_back(te);
+    csLocks.emplace_back(new ::xstore::util::SpinLock());
     return table.size();
   }
 
@@ -318,7 +321,10 @@ struct LeafTable {
    */
   auto insert_synonym(const K &key, const V &val, const usize l_idx, leaf_t* leaf, leaf_alloc_t* alloc) -> bool {
     // lock the leaf
-    lock_leaf(l_idx);
+    if(SynonymTable[0].leaf_num == kSynonymMax-1) return false;
+    // lock_leaf(l_idx);
+    this->csLocks[l_idx]->lock();
+    // LOG(4) << "lock " << l_idx;
     // obtain synonym leaf index
     leaf_t *cur = leaf;
     usize s_idx = table[l_idx].synonym_leaf;
@@ -331,6 +337,12 @@ struct LeafTable {
     // To guarantee all data sorted, we traverse leaves from back
     int idx = -1;
     for(int i=s_leaves.size()-1; i>=0; i--) {
+      // if(s_leaves[i]>SynonymTable[0].leaf_num) {
+      //   LOG(2) <<"SynonymTable[0].leaf_num: "<<SynonymTable[0].leaf_num;
+      //   for(auto sli:s_leaves) LOG(2) <<"sli: "<<sli;
+      //   print(alloc);
+      //   ASSERT(false);
+      // }
       leaf_t* tem_leaf = reinterpret_cast<leaf_t*>(alloc->get_leaf(SynonymTable[s_leaves[i]].leaf_num));
       if(tem_leaf->insertHere(key)) {
         cur = tem_leaf;
@@ -338,8 +350,18 @@ struct LeafTable {
         break;
       }
     }
+    if(cur->contain(key)) {
+      // unlock_leaf(l_idx);
+      this->csLocks[l_idx]->unlock();
+      return false;
+    }
     // insert into leaf: full?
     if(cur->isfull()) {
+      if(SynonymTable[0].leaf_num == kSynonymMax-1) {
+        // unlock_leaf(l_idx);
+        this->csLocks[l_idx]->unlock();
+        return false;
+      }
       auto res = alloc->fetch_new_leaf();
       // insert into synonym table
       if(idx==-1)
@@ -358,7 +380,9 @@ struct LeafTable {
       if(n_leaf->insertHere(key)) cur = n_leaf;
     }
     cur->insert_not_full(key, val);
-    unlock_leaf(l_idx);
+    // LOG(3) << "unlock " << l_idx;
+    // unlock_leaf(l_idx);
+    this->csLocks[l_idx]->unlock();
     return true;
   }
 

@@ -5,7 +5,7 @@
 
 
 #include "xutils/marshal.hh"
-#include "xkv_core/src/xtree/spin_lock.hh"
+#include "xutils/spin_lock.hh"
 #include "r2/src/common.hh"
 
 using namespace r2;
@@ -23,7 +23,7 @@ namespace rolex {
  */
 template <typename Leaf, usize S>
 class LeafAllocator {
-  ::xstore::xkv::xtree::CompactSpinLock lock;
+  ::xstore::util::SpinLock lock;
   char *mem_pool = nullptr;      /// the start memory of the allocated data leaves 
   const u64 total_sz = 0;        /// the total size of the register memory that we can allocate
   u64 cur_alloc_sz = 0;          /// the size that has been allocated
@@ -48,7 +48,8 @@ public:
    * @param leaf_num the predefined leaf_num
    */
   explicit LeafAllocator(char *m, const u64 &t, const u64 &leaf_num) : mem_pool(m), total_sz(t) {
-    ASSERT(leaf_num<(total_sz-sizeof(u64))/S) << "Small leaf region for allocating";
+    LOG(3) << "leaf_num: "<<leaf_num<<" , (total_sz-sizeof(u64))/S): "<<(total_sz-sizeof(u64))/S;
+    ASSERT(leaf_num<(total_sz-sizeof(u64))/S) << "Small leaf region for allocating "<<(total_sz-sizeof(u64))/S;
     prealloc_leaves(leaf_num);
   }
 
@@ -69,7 +70,9 @@ public:
   // ============ allocate leaves ===============
   auto fetch_new_leaf() -> std::pair<char *, u64> {
     u64 num = fetch_and_add();
-    ASSERT(num < allocated_num()) << "Preallocated leaves are insufficient.";
+    // if(num>=allocated_num()) 
+    //   LOG(2) <<"Preallocated " <<allocated_num()<< " leaves are insufficient for num: "<<num << ", key "<<key;
+    ASSERT(num < allocated_num()) << "Preallocated " <<allocated_num()<< " leaves are insufficient for num: "<<num;
     return {mem_pool + 2*sizeof(u64) + num*S, num};
   }
   
@@ -121,7 +124,11 @@ private:
     lock.lock();
     auto res = ::xstore::util::Marshal<u64>::deserialize(mem_pool, sizeof(u64));
     auto res_add = res+1;
+    // LOG(2) << "now used "<<res_add;
+    // ASSERT(res_add != 0) << "fetch_and_add, before add 1: "<<res<< ", add 1: "<<res_add;
     memcpy(mem_pool, &(res_add), sizeof(u64));
+    auto read_res = ::xstore::util::Marshal<u64>::deserialize(mem_pool, sizeof(u64));
+    ASSERT(res_add == read_res) << "fetch_and_add, affer add 1: "<<res_add<< ", read_res: "<<read_res;
     lock.unlock();
     return res;
   }

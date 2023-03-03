@@ -55,6 +55,15 @@ struct __attribute__((packed)) Leaf
     return false;
   }
 
+  auto contain(const K &key) ->bool {
+    if(keys[0]>key) return false;
+    for (uint i = 0; i < N; ++i) {
+      if (this->keys[i] == key) 
+        return true;
+    }
+    return false;
+  }
+
   auto update(const K &key, const V &val) -> bool {
     if(keys[0]>key) return false;
     for (uint i = 0; i < N; ++i) {
@@ -99,7 +108,7 @@ struct __attribute__((packed)) Leaf
       if(this->keys[i] > key) break;
     }
     u8 j=i;
-    while(this->keys[j]!=invalidKey()) j++;
+    while(j<N && this->keys[j]!=invalidKey()) j++;
     if(j>=N) return N;
     std::copy_backward(keys+i, keys+j, keys+j+1);
     std::copy_backward(vals+i, vals+j, vals+j+1);

@@ -4,7 +4,6 @@
 #include "r2/src/libroutine.hh"
 #include "r2/src/rdma/async_op.hh"              /// AsyncOp
 #include "rlib/core/qps/rc.hh"                  /// RC
-#include "xcomm/src/batch_rw_op.hh"             /// BatchOp
 
 #include "plr.hpp"
 #include "submodel.hpp"
@@ -16,7 +15,6 @@
 using namespace r2;
 using namespace r2::rdma;
 using namespace rdma::qp;
-using namespace xstore::xcomm;
 using namespace xstore;
 
 
