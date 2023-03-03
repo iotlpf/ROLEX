@@ -1,0 +1,9 @@
+[[pass]]
+host = "val08"
+path = ''
+cmd  = 'cd rib/; cmake .; make uoclient;'
+
+[[pass]]
+host = "val09"
+path = ''
+cmd  = 'cd rib/; cmake .; make uoserver;'

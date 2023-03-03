@@ -1,0 +1,9 @@
+[[pass]]
+host = "val09"
+path = ''
+cmd  = 'cd rib/; ./roserver'
+
+[[pass]]
+host = "val08"
+path = ''
+cmd  = 'cd rib/; ./roclient -addr val09:8888'

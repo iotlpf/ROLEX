@@ -1,0 +1,20 @@
+Refine list:
+- Different codes (done, good result code)
+- Marshalling lib (done)
+- Memory (done)
+- Memory registration + factory (done)
+- QPs
+  - progress (done)
+  - RC (done)
+  - QP poll
+  - QP factory
+  - fetch op
+- Simple bootstrap RPC
+  - timeout (done)
+  - TCP (done)
+  - RPC sender (done)
+  - RPC receiver (done)
+  - UDP (done)
+  - connector ()
+- QPs
+  - UD

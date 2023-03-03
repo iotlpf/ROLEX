@@ -1,0 +1,12 @@
+[submodule "deps/rlib"]
+	path = deps/rlib
+	url = https://github.com/wxdwfc/rlibv2.git
+[submodule "deps/gflags"]
+	path = deps/gflags
+	url = https://github.com/gflags/gflags.git
+[submodule "deps/googletest"]
+	path = deps/googletest
+	url = https://github.com/google/googletest.git
+[submodule "deps/jemalloc"]
+	path = deps/jemalloc
+	url = https://github.com/jemalloc/jemalloc.git

@@ -1,0 +1,33 @@
+before_script:
+  - python -V  # Print out python version for debugging
+  - pip install toml
+  - git config --global user.email "wxdwfc@gmail.com"
+  - git config --global user.name "wxd"
+  - git submodule sync
+  - git submodule update --init
+  - git submodule update --remote deps/rlib
+  - export export CXX=g++-7
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - deps/
+
+# run tests using the binary built before
+build:
+  stage: build
+  tags:
+  - rdma
+  script:
+    - cmake .; make boost; make jemalloc; make;
+
+
+test:
+  stage: test
+  tags:
+  - rdma
+  script:
+#    - cmake .; make boost;
+    - cmake .; make coretest; ./coretest;
+    - cmake .; make coretest_wo_rdma; ./coretest_wo_rdma;
+

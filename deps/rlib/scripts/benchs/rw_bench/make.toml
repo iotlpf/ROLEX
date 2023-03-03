@@ -1,0 +1,14 @@
+[[pass]]
+host = "val09"
+path = ''
+cmd  = 'cd rib/; cmake .; make bench_server;'
+
+[[pass]]
+host = "val08"
+path = ''
+cmd  = 'cd rib/; cmake .; make bench_client;'
+
+[[pass]]
+host = "val10"
+path = ''
+cmd  = 'cd rib/; cmake .; make bench_client;'

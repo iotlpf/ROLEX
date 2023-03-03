@@ -1,0 +1,12 @@
+*~
+*.exe
+*.swp
+*.DS_Store
+build/
+.vs/
+.vscode/
+.git/
+.settings/
+.cproject
+.project
+

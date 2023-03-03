@@ -1,0 +1,9 @@
+[[pass]]
+host = "val08"
+path = ''
+cmd  = 'cd rib/; ./pserver'
+
+[[pass]]
+host = "val08"
+path = ''
+cmd  = 'cd rib/; ./pclient'

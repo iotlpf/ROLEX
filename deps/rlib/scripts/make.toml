@@ -1,0 +1,4 @@
+[[pass]]
+host = "val02"
+path = ''
+cmd  = 'cd rib/; cmake .; make coretest'
