@@ -18,8 +18,7 @@ $ make
 3. Create HugePage
 ### Run
 ```
-./rolex_server --nkeys=100000 --non_nkeys=100000
-./rolex_client --nkeys=100000 --non_nkeys=100000 --read_ratio=1 --insert_ratio=0
+./rolex --nkeys=100000 --non_nkeys=100000
 ```
    
 | parameters | descriptions |
