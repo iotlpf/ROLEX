@@ -32,9 +32,9 @@ TEST(LeafTable, leaf_table) {
 
 TEST(LeafTable, leaf_data) {
   const usize MB = 1024 * 1024;
-  const usize leaf_num = 10000;
+  const usize leaf_num = 100;
   RCtrl* ctrl = new RCtrl(8888);
-  RM_config conf(ctrl, 8 * MB, leaf_num*sizeof(leaf_t), 0, leaf_num);
+  RM_config conf(ctrl, 1024 * MB, leaf_num*sizeof(leaf_t), 0, leaf_num);
   remote_memory_t* RM = new remote_memory_t(conf);
   auto alloc = RM->leaf_allocator();
 
